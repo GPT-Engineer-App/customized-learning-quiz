@@ -25,6 +25,55 @@ const QUESTIONS = [
     topic: "Network Operations",
     difficulty: "advanced",
   },
+  {
+    question: "What is the purpose of a subnet mask?",
+    options: ["To identify the network portion of an IP address", "To encrypt data transmitted over the network", "To translate domain names to IP addresses", "To route packets between networks"],
+    answer: "To identify the network portion of an IP address",
+    topic: "Network Architecture",
+    difficulty: "intermediate",
+  },
+  {
+    question: "What is the purpose of a VLAN?",
+    options: ["To segment a network into smaller logical networks", "To encrypt data transmitted over the network", "To translate domain names to IP addresses", "To route packets between networks"],
+    answer: "To segment a network into smaller logical networks",
+    topic: "Network Architecture",
+    difficulty: "advanced",
+  },
+  {
+    question: "What is the purpose of a DMZ?",
+    options: ["To provide a secure area for public-facing servers", "To encrypt data transmitted over the network", "To translate domain names to IP addresses", "To route packets between networks"],
+    answer: "To provide a secure area for public-facing servers",
+    topic: "Network Security",
+    difficulty: "advanced",
+  },
+  {
+    question: "What is the purpose of a VPN?",
+    options: ["To provide a secure connection over an untrusted network", "To encrypt data transmitted over the network", "To translate domain names to IP addresses", "To route packets between networks"],
+    answer: "To provide a secure connection over an untrusted network",
+    topic: "Network Security",
+    difficulty: "intermediate",
+  },
+  {
+    question: "What is the purpose of a load balancer?",
+    options: ["To distribute traffic across multiple servers", "To encrypt data transmitted over the network", "To translate domain names to IP addresses", "To route packets between networks"],
+    answer: "To distribute traffic across multiple servers",
+    topic: "Network Operations",
+    difficulty: "advanced",
+  },
+  {
+    question: "What is the purpose of a proxy server?",
+    options: ["To act as an intermediary between clients and servers", "To encrypt data transmitted over the network", "To translate domain names to IP addresses", "To route packets between networks"],
+    answer: "To act as an intermediary between clients and servers",
+    topic: "Network Security",
+    difficulty: "intermediate",
+  },
+  {
+    question: "What is the purpose of a network switch?",
+    options: ["To connect devices on a network and forward data packets", "To encrypt data transmitted over the network", "To translate domain names to IP addresses", "To route packets between networks"],
+    answer: "To connect devices on a network and forward data packets",
+    topic: "Network Architecture",
+    difficulty: "basic",
+  },
 ];
 
 const Notepad = ({ isVisible }) => {
@@ -50,6 +99,8 @@ const Index = () => {
   const [showResult, setShowResult] = useState(false);
   const [startLearningTopic, setStartLearningTopic] = useState(false);
   const [showNotepad, setShowNotepad] = useState(true);
+  const [incorrectQuestions, setIncorrectQuestions] = useState([]);
+  const [quizScore, setQuizScore] = useState(0);
   const toast = useToast();
 
   const handleAnswerSelect = (answer) => {
@@ -57,7 +108,9 @@ const Index = () => {
   };
 
   const handleNextQuestion = () => {
-    if (selectedAnswer === QUESTIONS[currentQuestion].answer) {
+    const isCorrect = selectedAnswer === QUESTIONS[currentQuestion].answer;
+
+    if (isCorrect) {
       setScores((prevScores) => ({
         ...prevScores,
         [QUESTIONS[currentQuestion].topic]: prevScores[QUESTIONS[currentQuestion].topic] + 1,
@@ -69,6 +122,7 @@ const Index = () => {
         isClosable: true,
       });
     } else {
+      setIncorrectQuestions((prevIncorrectQuestions) => [...prevIncorrectQuestions, QUESTIONS[currentQuestion]]);
       toast({
         title: "Incorrect!",
         status: "error",
@@ -88,6 +142,8 @@ const Index = () => {
     setSelectedAnswer("");
     if (!startLearningTopic) {
       if (currentQuestion === QUESTIONS.length - 1) {
+        const score = Math.round((scores.reduce((sum, score) => sum + score, 0) / QUESTIONS.length) * 100);
+        setQuizScore(score);
         setShowResult(true);
       } else {
         setCurrentQuestion((prevQuestion) => prevQuestion + 1);
@@ -105,6 +161,15 @@ const Index = () => {
     setSelectedAnswer("");
     setScores({});
     setShowResult(false);
+    setIncorrectQuestions([]);
+    setQuizScore(0);
+  };
+
+  const startNextQuiz = () => {
+    const newQuestions = [...incorrectQuestions, ...QUESTIONS.filter((question) => !incorrectQuestions.includes(question))].slice(0, 10);
+    QUESTIONS.splice(0, QUESTIONS.length, ...newQuestions);
+    restartQuiz();
+    startQuiz();
   };
 
   const renderCustomizedMaterial = () => {
@@ -185,7 +250,16 @@ const Index = () => {
         )}
         {showResult && (
           <Box bg="white" p={8} borderRadius="md" boxShadow="lg">
+            <Heading size="xl" mb={4}>
+              Quiz Result
+            </Heading>
+            <Text fontSize="xl" mb={4}>
+              Your score: {quizScore}%
+            </Text>
             {renderCustomizedMaterial()}
+            <Button mt={4} colorScheme="blue" onClick={startNextQuiz}>
+              Next Quiz
+            </Button>
           </Box>
         )}
         {startLearningTopic && (
