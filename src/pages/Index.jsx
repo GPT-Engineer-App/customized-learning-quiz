@@ -33,6 +33,7 @@ const Index = () => {
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [scores, setScores] = useState({});
   const [showResult, setShowResult] = useState(false);
+  const [startLearningTopic, setStartLearningTopic] = useState(false);
   const toast = useToast();
 
   const startQuiz = () => {
@@ -60,17 +61,31 @@ const Index = () => {
       toast({
         title: "Incorrect!",
         status: "error",
-        duration: 1000,
+        duration: null,
         isClosable: true,
+        render: () => (
+          <Box color="white" p={3} bg="red.500" borderRadius="md">
+            <Text mb={2}>Incorrect!</Text>
+            <Button size="sm" onClick={() => handleStartLearningTopic()}>
+              Learn More
+            </Button>
+          </Box>
+        ),
       });
     }
 
     setSelectedAnswer("");
-    if (currentQuestion === QUESTIONS.length - 1) {
-      setShowResult(true);
-    } else {
-      setCurrentQuestion((prevQuestion) => prevQuestion + 1);
+    if (!startLearningTopic) {
+      if (currentQuestion === QUESTIONS.length - 1) {
+        setShowResult(true);
+      } else {
+        setCurrentQuestion((prevQuestion) => prevQuestion + 1);
+      }
     }
+  };
+
+  const handleStartLearningTopic = () => {
+    setStartLearningTopic(true);
   };
 
   const restartQuiz = () => {
@@ -144,6 +159,17 @@ const Index = () => {
         </Box>
       )}
       {showResult && renderCustomizedMaterial()}
+      {startLearningTopic && (
+        <Box>
+          <Heading size="xl" mb={4}>
+            Learning Topic: {QUESTIONS[currentQuestion].topic}
+          </Heading>
+          <Text fontSize="xl" mb={4}>
+            Here you can provide learning material related to the topic of the question the user answered incorrectly.
+          </Text>
+          <Button onClick={() => setStartLearningTopic(false)}>Continue Quiz</Button>
+        </Box>
+      )}
     </Box>
   );
 };
