@@ -141,7 +141,7 @@ const Index = () => {
 
   return (
     <Box p={8} minHeight="100vh" bgGradient="linear(to-br, blue.400, teal.400)">
-      <Heading size="2xl" mb={8}>
+      <Heading size="2xl" mb={8} textAlign="center">
         Comptia Course
       </Heading>
       <Grid templateColumns="1fr 300px" gap={8}>
