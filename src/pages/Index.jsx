@@ -9,8 +9,22 @@ const QUESTIONS = [
     options: ["To allow all traffic", "To block unauthorized access", "To encrypt data", "To compress data"],
     answer: "To block unauthorized access",
     topic: "Network Security",
+    difficulty: "basic",
   },
-  // Add more questions for each topic...
+  {
+    question: "What is the difference between a public and private IP address?",
+    options: ["Public IP addresses are used within a network, private IP addresses are used on the Internet", "Private IP addresses are used within a network, public IP addresses are used on the Internet", "There is no difference, they are interchangeable", "Public IP addresses are more secure than private IP addresses"],
+    answer: "Private IP addresses are used within a network, public IP addresses are used on the Internet",
+    topic: "Network Architecture",
+    difficulty: "intermediate",
+  },
+  {
+    question: "What is the purpose of ARP (Address Resolution Protocol)?",
+    options: ["To map IP addresses to MAC addresses", "To encrypt data transmitted over the network", "To translate domain names to IP addresses", "To route packets between networks"],
+    answer: "To map IP addresses to MAC addresses",
+    topic: "Network Operations",
+    difficulty: "advanced",
+  },
 ];
 
 const Index = () => {
@@ -68,7 +82,17 @@ const Index = () => {
   };
 
   const renderCustomizedMaterial = () => {
+    const scoresByDifficulty = QUESTIONS.reduce(
+      (acc, question) => {
+        const { topic, difficulty } = question;
+        acc[difficulty][topic] = (acc[difficulty][topic] || 0) + (selectedAnswer === question.answer ? 1 : 0);
+        return acc;
+      },
+      { basic: {}, intermediate: {}, advanced: {} },
+    );
+
     const weakestTopic = Object.entries(scores).sort(([, a], [, b]) => a - b)[0][0];
+    const weakestDifficulty = Object.entries(scoresByDifficulty).sort(([, a], [, b]) => Object.values(a).reduce((sum, score) => sum + score, 0) - Object.values(b).reduce((sum, score) => sum + score, 0))[0][0];
 
     return (
       <Box>
@@ -76,9 +100,9 @@ const Index = () => {
           Customized Learning Material
         </Heading>
         <Text fontSize="xl" mb={4}>
-          Based on your quiz performance, we recommend focusing on: <strong>{weakestTopic}</strong>
+          Based on your quiz performance, we recommend focusing on: <strong>{weakestTopic}</strong> at the <strong>{weakestDifficulty}</strong> level.
         </Text>
-        {/* Add customized learning material for the weakest topic */}
+        {}
         <Button onClick={restartQuiz}>Restart Quiz</Button>
       </Box>
     );
