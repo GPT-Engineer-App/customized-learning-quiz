@@ -197,28 +197,7 @@ const Index = () => {
           <Notepad isVisible={showNotepad} />
         </GridItem>
       </Grid>
-      {quizStarted && !showResult && (
-        <Box>
-          <Heading size="xl" mb={4}>
-            Question {currentQuestion + 1}
-          </Heading>
-          <Text fontSize="xl" mb={4}>
-            {QUESTIONS[currentQuestion].question}
-          </Text>
-          <RadioGroup value={selectedAnswer} onChange={handleAnswerSelect}>
-            <VStack spacing={2} align="start">
-              {QUESTIONS[currentQuestion].options.map((option, index) => (
-                <Radio key={index} value={option}>
-                  {option}
-                </Radio>
-              ))}
-            </VStack>
-          </RadioGroup>
-          <Button mt={4} colorScheme="blue" onClick={handleNextQuestion} isDisabled={!selectedAnswer}>
-            {currentQuestion === QUESTIONS.length - 1 ? "Finish" : "Next"}
-          </Button>
-        </Box>
-      )}
+
       {showResult && renderCustomizedMaterial()}
       {startLearningTopic && (
         <Box>
