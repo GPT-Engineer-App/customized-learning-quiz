@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Heading, Text, VStack, Button, Radio, RadioGroup, useToast } from "@chakra-ui/react";
+import { Box, Heading, Text, VStack, Button, Radio, RadioGroup, useToast, Grid, GridItem, Textarea } from "@chakra-ui/react";
 
 const TOPICS = ["Network Security", "Operational Procedures", "Network Operations", "Network Architecture", "Network Troubleshooting"];
 
@@ -27,6 +27,21 @@ const QUESTIONS = [
   },
 ];
 
+const Notepad = ({ isVisible }) => {
+  const [note, setNote] = useState("");
+
+  if (!isVisible) return null;
+
+  return (
+    <Box bg="white" p={4} borderRadius="md" boxShadow="md">
+      <Heading size="lg" mb={2}>
+        Notepad
+      </Heading>
+      <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Take notes here..." />
+    </Box>
+  );
+};
+
 const Index = () => {
   const [quizStarted, setQuizStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -34,6 +49,7 @@ const Index = () => {
   const [scores, setScores] = useState({});
   const [showResult, setShowResult] = useState(false);
   const [startLearningTopic, setStartLearningTopic] = useState(false);
+  const [showNotepad, setShowNotepad] = useState(true);
   const toast = useToast();
 
   const startQuiz = () => {
@@ -124,18 +140,63 @@ const Index = () => {
   };
 
   return (
-    <Box p={8}>
+    <Box p={8} minHeight="100vh" bgGradient="linear(to-br, blue.400, teal.400)">
       <Heading size="2xl" mb={8}>
         Comptia Course
       </Heading>
-      {!quizStarted && (
-        <VStack spacing={4} align="stretch">
-          <Text fontSize="xl">Take a short quiz to customize your learning experience.</Text>
-          <Button colorScheme="blue" onClick={startQuiz}>
-            Start Quiz
-          </Button>
-        </VStack>
-      )}
+      <Grid templateColumns="1fr 300px" gap={8}>
+        <GridItem>
+          {!quizStarted && (
+            <VStack spacing={4} align="stretch" bg="white" p={8} borderRadius="md" boxShadow="lg">
+              <Text fontSize="xl">Take a short quiz to customize your learning experience.</Text>
+              <Button colorScheme="blue" onClick={startQuiz}>
+                Start Quiz
+              </Button>
+            </VStack>
+          )}
+          {quizStarted && !showResult && (
+            <Box bg="white" p={8} borderRadius="md" boxShadow="lg">
+              <Heading size="xl" mb={4}>
+                Question {currentQuestion + 1}
+              </Heading>
+              <Text fontSize="xl" mb={4}>
+                {QUESTIONS[currentQuestion].question}
+              </Text>
+              <RadioGroup value={selectedAnswer} onChange={handleAnswerSelect}>
+                <VStack spacing={2} align="start">
+                  {QUESTIONS[currentQuestion].options.map((option, index) => (
+                    <Radio key={index} value={option}>
+                      {option}
+                    </Radio>
+                  ))}
+                </VStack>
+              </RadioGroup>
+              <Button mt={4} colorScheme="blue" onClick={handleNextQuestion} isDisabled={!selectedAnswer}>
+                {currentQuestion === QUESTIONS.length - 1 ? "Finish" : "Next"}
+              </Button>
+            </Box>
+          )}
+          {showResult && (
+            <Box bg="white" p={8} borderRadius="md" boxShadow="lg">
+              {renderCustomizedMaterial()}
+            </Box>
+          )}
+          {startLearningTopic && (
+            <Box bg="white" p={8} borderRadius="md" boxShadow="lg">
+              <Heading size="xl" mb={4}>
+                Learning Topic: {QUESTIONS[currentQuestion].topic}
+              </Heading>
+              <Text fontSize="xl" mb={4}>
+                Here you can provide learning material related to the topic of the question the user answered incorrectly.
+              </Text>
+              <Button onClick={() => setStartLearningTopic(false)}>Continue Quiz</Button>
+            </Box>
+          )}
+        </GridItem>
+        <GridItem>
+          <Notepad isVisible={showNotepad} />
+        </GridItem>
+      </Grid>
       {quizStarted && !showResult && (
         <Box>
           <Heading size="xl" mb={4}>
