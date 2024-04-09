@@ -107,6 +107,8 @@ const Index = () => {
     setSelectedAnswer(answer);
   };
 
+  const [isHoveringToast, setIsHoveringToast] = useState(false);
+
   const handleNextQuestion = () => {
     const isCorrect = selectedAnswer === QUESTIONS[currentQuestion].answer;
 
@@ -118,18 +120,20 @@ const Index = () => {
       toast({
         title: "Correct!",
         status: "success",
-        duration: 1000,
+        duration: isHoveringToast ? null : 5000,
         isClosable: true,
+        onMouseEnter: () => setIsHoveringToast(true),
+        onMouseLeave: () => setIsHoveringToast(false),
       });
     } else {
       setIncorrectQuestions((prevIncorrectQuestions) => [...prevIncorrectQuestions, QUESTIONS[currentQuestion]]);
       toast({
         title: "Incorrect!",
         status: "error",
-        duration: null,
+        duration: isHoveringToast ? null : 5000,
         isClosable: true,
         render: () => (
-          <Box color="white" p={3} bg="red.500" borderRadius="md">
+          <Box color="white" p={3} bg="red.500" borderRadius="md" onMouseEnter={() => setIsHoveringToast(true)} onMouseLeave={() => setIsHoveringToast(false)}>
             <Text mb={2}>Incorrect!</Text>
             <Button size="sm" onClick={() => handleStartLearningTopic()}>
               Learn More
